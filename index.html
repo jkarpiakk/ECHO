@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formularz ECHO CLS</title>
+  <!-- Tailwind CSS via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2/dist/tailwind.min.css" rel="stylesheet">
+  <!-- PapaParse for CSV export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <!-- docx.js for DOCX export -->
+  <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
+</head>
+<body class="bg-gray-50">
+  <div class="max-w-4xl mx-auto p-6 bg-white shadow-md mt-10 rounded-lg">
+    <header class="flex items-center mb-6">
+      <img src="logo_szpitala.png" alt="Logo kliniki" class="h-16 mr-4">
+      <div>
+        <h1 class="text-xl font-bold">Klinika Kardiologii z Pododdziałem Ostrych Zespołów Wieńcowych</h1>
+        <p>Kliniczny Szpital Wojewódzki Nr 2 im. Św. Jadwigi Królowej w Rzeszowie</p>
+        <p>ul. Lwowska 60, 35-301 Rzeszów</p>
+      </div>
+    </header>
+    <h2 class="text-lg font-semibold mb-4">Formularz badania echokardiograficznego</h2>
+    <form id="echoForm" class="space-y-4">
+      <!-- Sekcja 1: Dane pacjenta -->
+      <fieldset class="border p-4 rounded">
+        <legend class="font-medium">1. Dane pacjenta</legend>
+        <div class="grid grid-cols-2 gap-4 mt-2">
+          <div>
+            <label class="block text-sm">Imię i nazwisko</label>
+            <input name="patientName" type="text" class="w-full border rounded p-2" />
+          </div>
+          <div>
+            <label class="block text-sm">Nr badania / ID pacjenta</label>
+            <input name="patientID" type="text" class="w-full border rounded p-2" />
+          </div>
+          <div>
+            <label class="block text-sm">Data badania</label>
+            <input name="examDate" type="date" class="w-full border rounded p-2" />
+          </div>
+          <div>
+            <label class="block text-sm">Operator / lekarz</label>
+            <input name="operator" type="text" class="w-full border rounded p-2" />
+          </div>
+        </div>
+      </fieldset>
+      <!-- Sekcja 2: Wymiary jam serca -->
+      <fieldset class="border p-4 rounded">
+        <legend class="font-medium">2. Wymiary jam serca (M-mode / 2D)</legend>
+        <div class="grid grid-cols-3 gap-4 mt-2">
+          <!-- Parametry listowane dynamicznie -->
+          <template id="dimension-template">
+            <div>
+              <label class="block text-sm js-param-label"></label>
+              <input type="number" step="any" class="w-full border rounded p-2 js-param-value" />
+            </div>
+          </template>
+        </div>
+      </fieldset>
+      <!-- Sekcja 3: Średnice pni naczyniowych -->
+      <fieldset class="border p-4 rounded">
+        <legend class="font-medium">3. Średnice pni naczyniowych</legend>
+        <div class="grid grid-cols-3 gap-4 mt-2">
+          <template id="vessel-template">
+            <div>
+              <label class="block text-sm js-param-label"></label>
+              <input type="number" step="any" class="w-full border rounded p-2 js-param-value" />
+            </div>
+          </template>
+        </div>
+      </fieldset>
+      <!-- Sekcja 4: Objętości i funkcja skurczowa -->
+      <fieldset class="border p-4 rounded">
+        <legend class="font-medium">4. Objętości i funkcja skurczowa</legend>
+        <div class="space-y-2 mt-2">
+          <div>
+            <label class="block text-sm">Frakcja wyrzutowa (EF) [%]</label>
+            <input name="EF" type="number" step="any" class="w-24 border rounded p-2" />
+            <span class="ml-4 text-sm">Metoda:</span>
+            <select name="EFmethod" class="border rounded p-1">
+              <option>Simpson</option>
+              <option>Teichholz</option>
+              <option>Inna</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm">EDV [ml]</label>
+            <input name="EDV" type="number" step="any" class="w-24 border rounded p-2" />
+          </div>
+          <div>
+            <label class="block text-sm">ESV [ml]</label>
+            <input name="ESV" type="number" step="any" class="w-24 border rounded p-2" />
+          </div>
+        </div>
+      </fieldset>
+      <!-- Sekcja komentarza i przyciski -->
+      <div class="flex space-x-4 mt-6">
+        <button type="button" id="exportCsv" class="px-4 py-2 bg-blue-600 text-white rounded">Eksportuj CSV</button>
+        <button type="button" id="exportDocx" class="px-4 py-2 bg-green-600 text-white rounded">Eksportuj DOCX</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Definicje parametrów
+    const dimensions = [
+      { key: 'LVIDd', label: 'LV (LVIDd/s) [mm]' },
+      { key: 'IVSd', label: 'IVSd [mm]' },
+      { key: 'PWd', label: 'PWd [mm]' },
+      { key: 'LA', label: 'LA [mm]' },
+      { key: 'LAVI', label: 'LAVI [ml/m²]' },
+      { key: 'RAA', label: 'RAA [cm²]' },
+      { key: 'RV', label: 'RV [mm]' }
+    ];
+    const vessels = [
+      { key: 'OpuszkaAorty', label: 'Opuszka aorty [mm]' },
+      { key: 'AortaWstepujaca', label: 'Aorta wstępująca [mm]' },
+      { key: 'MPA', label: 'Pień płucny (MPA) [mm]' }
+    ];
+    // Render pola dynamiczne
+    const dimContainer = document.querySelector('#echoForm fieldset:nth-of-type(2) .grid');
+    const dimTemplate = document.getElementById('dimension-template');
+    dimensions.forEach(d => {
+      const el = dimTemplate.content.cloneNode(true);
+      el.querySelector('.js-param-label').textContent = d.label;
+      el.querySelector('.js-param-value').name = d.key;
+      dimContainer.appendChild(el);
+    });
+    const vesContainer = document.querySelector('#echoForm fieldset:nth-of-type(3) .grid');
+    const vesTemplate = document.getElementById('vessel-template');
+    vessels.forEach(v => {
+      const el = vesTemplate.content.cloneNode(true);
+      el.querySelector('.js-param-label').textContent = v.label;
+      el.querySelector('.js-param-value').name = v.key;
+      vesContainer.appendChild(el);
+    });
+
+    // Funkcja zbierająca dane z formularza
+    function collectData() {
+      const form = document.getElementById('echoForm');
+      const data = {};
+      new FormData(form).forEach((value, key) => {
+        data[key] = value;
+      });
+      return data;
+    }
+
+    // Eksport CSV
+    document.getElementById('exportCsv').addEventListener('click', () => {
+      const data = collectData();
+      const csv = Papa.unparse([data]);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `echo_${data.patientID || 'record'}.csv`;
+      link.click();
+    });
+
+    // Eksport DOCX przy użyciu docx.js
+    document.getElementById('exportDocx').addEventListener('click', async () => {
+      const { Document, Packer, Paragraph } = docx;
+      const data = collectData();
+      const doc = new Document();
+
+      doc.addSection({
+        children: [
+          new Paragraph({ text: 'Formularz badania echokardiograficznego', heading: docx.HeadingLevel.HEADING_1 }),
+          ...dimensions.map(d => new Paragraph(`${d.label}: ${data[d.key] || ''}`)),
+          ...vessels.map(v => new Paragraph(`${v.label}: ${data[v.key] || ''}`))
+        ]
+      });
+
+      const blob = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `echo_${data.patientID || 'form'}.docx`;
+      link.click();
+    });
+  </script>
+</body>
+</html>
