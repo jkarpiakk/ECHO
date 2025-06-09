@@ -17,13 +17,69 @@
       <img src="logo_szpitala.png" alt="Logo kliniki" class="h-16 mr-4">
       <div>
         <h1 class="text-xl font-bold">Klinika Kardiologii z Pododdziałem Ostrych Zespołów Wieńcowych</h1>
-        <p>Kliniczny Szpital Wojewódzki Nr 2 im. Św. Jadwigi Królowej w Rzeszowie</p>
-        <p>ul. Lwowska 60, 35-301 Rzeszów</p>
+        <p>Kliniczny Szpital Wojewódzki Nr 2 im. Św. Jadwigi Królowej w Rzeszowie</p>
+        <p>ul. Lwowska 60, 35‑301 Rzeszów</p>
       </div>
     </header>
     <h2 class="text-lg font-semibold mb-4">Formularz badania echokardiograficznego</h2>
     <form id="echoForm" class="space-y-6">
-      <!-- ... Sections 1-6 same ... -->
+      <!-- 1. Dane pacjenta -->
+      <fieldset class="border p-4 rounded">
+        <legend class="font-medium">1. Dane pacjenta</legend>
+        <div class="grid grid-cols-2 gap-4 mt-2">
+          <div><label class="block text-sm">Imię i nazwisko<input name="patientName" type="text" class="w-full border rounded p-2"/></label></div>
+          <div><label class="block text-sm">Nr badania / ID pacjenta<input name="patientID" type="text" class="w-full border rounded p-2"/></label></div>
+          <div><label class="block text-sm">Data badania<input name="examDate" type="date" class="w-full border rounded p-2"/></label></div>
+          <div><label class="block text-sm">Operator / lekarz<input name="operator" type="text" class="w-full border rounded p-2"/></label></div>
+        </div>
+      </fieldset>
+
+      <!-- 2. Wymiary jam serca -->
+      <fieldset class="border p-4 rounded">
+        <legend class="font-medium">2. Wymiary jam serca (M-mode / 2D)</legend>
+        <div class="grid grid-cols-3 gap-4 mt-2" id="dimContainer"></div>
+      </fieldset>
+
+      <!-- 3. Średnice pni naczyniowych -->
+      <fieldset class="border p-4 rounded">
+        <legend class="font-medium">3. Średnice pni naczyniowych</legend>
+        <div class="grid grid-cols-3 gap-4 mt-2" id="vesContainer"></div>
+      </fieldset>
+
+      <!-- 4. Objętości i funkcja skurczowa -->
+      <fieldset class="border p-4 rounded">
+        <legend class="font-medium">4. Objętości i funkcja skurczowa</legend>
+        <div class="space-y-2 mt-2">
+          <div>
+            <label class="block text-sm">Frakcja wyrzutowa (EF) [%]<input name="EF" type="number" step="any" class="w-24 border rounded p-2"/></label>
+            <span class="ml-4 text-sm">Metoda:</span>
+            <select name="EFmethod" class="border rounded p-1">
+              <option value="">-</option>
+              <option value="Simpson">Simpson</option>
+              <option value="Teichholz">Teichholz</option>
+              <option value="Inna">Inna</option>
+            </select>
+          </div>
+          <div><label class="block text-sm">EDV [ml]<input name="EDV" type="number" step="any" class="w-24 border rounded p-2"/></label></div>
+          <div><label class="block text-sm">ESV [ml]<input name="ESV" type="number" step="any" class="w-24 border rounded p-2"/></label></div>
+        </div>
+      </fieldset>
+
+      <!-- 5. Odcinkowe zaburzenia kurczliwości -->
+      <fieldset class="border p-4 rounded">
+        <legend class="font-medium">5. Odcinkowe zaburzenia kurczliwości</legend>
+        <div class="mt-2">
+          <label class="inline-flex items-center"><input type="checkbox" name="segmentalPresent" class="form-checkbox"/><span class="ml-2">Obecne</span></label>
+          <label class="block text-sm mt-2">Opis segmentów/uwagi<textarea name="segmentalDescription" class="w-full border rounded p-2 mt-1"></textarea></label>
+        </div>
+      </fieldset>
+
+      <!-- 6. TAPSE -->
+      <fieldset class="border p-4 rounded">
+        <legend class="font-medium">6. TAPSE</legend>
+        <label class="block text-sm mt-2">Wartość [mm]<input name="TAPSE" type="number" step="any" class="w-24 border rounded p-2"/></label>
+      </fieldset>
+
       <!-- 7. Ocena zastawek -->
       <fieldset class="border p-4 rounded">
         <legend class="font-medium">7. Ocena zastawek</legend>
@@ -32,84 +88,100 @@
           <div>
             <h3 class="font-semibold">7.1 Zastawka mitralna</h3>
             <div class="grid grid-cols-2 gap-4 mt-2">
-              <div>
-                <label class="block text-sm">Niedomykalność<select name="mitralRegurg" class="w-full border rounded p-1">
-                  <option value="">-</option>
-                  <option value="łagodna">łagodna</option>
-                  <option value="umiarkowana">umiarkowana</option>
-                  <option value="ciężka">ciężka</option>
-                </select></label>
-              </div>
-              <div>
-                <label class="block text-sm">Stenoza<select name="mitralStenosis" class="w-full border rounded p-1">
-                  <option value="">-</option>
-                  <option value="łagodna">łagodna</option>
-                  <option value="umiarkowana">umiarkowana</option>
-                  <option value="ciężka">ciężka</option>
-                </select></label>
-              </div>
+              <div><label class="block text-sm">Niedomykalność<select name="mitralRegurg" class="w-full border rounded p-1"><option value="">-</option><option value="łagodna">łagodna</option><option value="umiarkowana">umiarkowana</option><option value="ciężka">ciężka</option></select></label></div>
+              <div><label class="block text-sm">Stenoza<select name="mitralStenosis" class="w-full border rounded p-1"><option value="">-</option><option value="łagodna">łagodna</option><option value="umiarkowana">umiarkowana</option><option value="ciężka">ciężka</option></select></label></div>
             </div>
           </div>
           <!-- Aortalna -->
           <div>
             <h3 class="font-semibold">7.2 Zastawka aortalna</h3>
             <div class="grid grid-cols-2 gap-4 mt-2">
-              <div>
-                <label class="block text-sm">Niedomykalność<select name="aorticRegurg" class="w-full border rounded p-1">
-                  <option value="">-</option>
-                  <option value="łagodna">łagodna</option>
-                  <option value="umiarkowana">umiarkowana</option>
-                  <option value="ciężka">ciężka</option>
-                </select></label>
-              </div>
-              <div>
-                <label class="block text-sm">Stenoza<select name="aorticStenosis" class="w-full border rounded p-1">
-                  <option value="">-</option>
-                  <option value="łagodna">łagodna</option>
-                  <option value="umiarkowana">umiarkowana</option>
-                  <option value="ciężka">ciężka</option>
-                </select></label>
-              </div>
+              <div><label class="block text-sm">Niedomykalność<select name="aorticRegurg" class="w-full border rounded p-1"><option value="">-</option><option value="łagodna">łagodna</option><option value="umiarkowana">umiarkowana</option><option value="ciężka">ciężka</option></select></label></div>
+              <div><label class="block text-sm">Stenoza<select name="aorticStenosis" class="w-full border rounded p-1"><option value="">-</option><option value="łagodna">łagodna</option><option value="umiarkowana">umiarkowana</option><option value="ciężka">ciężka</option></select></label></div>
             </div>
           </div>
           <!-- Trójdzielna -->
           <div>
             <h3 class="font-semibold">7.3 Zastawka trójdzielna</h3>
             <div class="grid grid-cols-2 gap-4 mt-2">
-              <div>
-                <label class="block text-sm">Niedomykalność<select name="tricuspidRegurg" class="w-full border rounded p-1">
-                  <option value="">-</option>
-                  <option value="łagodna">łagodna</option>
-                  <option value="umiarkowana">umiarkowana</option>
-                  <option value="ciężka">ciężka</option>
-                </select></label>
-              </div>
-              <div>
-                <label class="block text-sm">Stenoza<select name="tricuspidStenosis" class="w-full border rounded p-1">
-                  <option value="">-</option>
-                  <option value="łagodna">łagodna</option>
-                  <option value="umiarkowana">umiarkowana</option>
-                  <option value="ciężka">ciężka</option>
-                </select></label>
-              </div>
+              <div><label class="block text-sm">Niedomykalność<select name="tricuspidRegurg" class="w-full border rounded p-1"><option value="">-</option><option value="łagodna">łagodna</option><option value="umiarkowana">umiarkowana</option><option value="ciężka">ciężka</option></select></label></div>
+              <div><label class="block text-sm">Stenoza<select name="tricuspidStenosis" class="w-full border rounded p-1"><option value="">-</option><option value="łagodna">łagodna</option><option value="umiarkowana">umiarkowana</option><option value="ciężka">ciężka</option></select></label></div>
             </div>
           </div>
         </div>
       </fieldset>
 
-      <!-- ... Sections 8-9, Export same ... -->
+      <!-- 8. Osierdzie -->
+      <fieldset class="border p-4 rounded">
+        <legend class="font-medium">8. Osierdzie</legend>
+        <div class="mt-2">
+          <label class="inline-flex items-center"><input type="checkbox" name="pericardEffusion" class="form-checkbox"/><span class="ml-2">Płyn w osierdziu obecny</span></label>
+          <label class="block text-sm mt-2">Ilość / uwagi<textarea name="pericardNotes" class="w-full border rounded p-2 mt-1"></textarea></label>
+        </div>
+      </fieldset>
+
+      <!-- 9. Uwagi końcowe i rekomendacje -->
+      <fieldset class="border p-4 rounded">
+        <legend class="font-medium">9. Uwagi końcowe i rekomendacje</legend>
+        <textarea name="remarks" class="w-full border rounded p-2 mt-1" rows="4"></textarea>
+      </fieldset>
+
+      <!-- Eksport -->
+      <div class="flex space-x-4 mt-6">
+        <button type="button" id="exportCsv" class="px-4 py-2 bg-blue-600 text-white rounded">Eksportuj CSV</button>
+        <button type="button" id="exportDocx" class="px-4 py-2 bg-green-600 text-white rounded">Eksportuj DOCX</button>
+      </div>
     </form>
   </div>
 
   <script>
-    // ... dynamic field rendering same ...
-    // Collect form data
+    // Parametry dynamiczne
+    const dimensions = [
+      { key: 'LVIDd', label: 'LV (LVIDd/s) [mm]' },
+      { key: 'IVSd', label: 'IVSd [mm]' },
+      { key: 'PWd', label: 'PWd [mm]' },
+      { key: 'LA', label: 'LA [mm]' },
+      { key: 'LAVI', label: 'LAVI [ml/m²]' },
+      { key: 'RAA', label: 'RAA [cm²]' },
+      { key: 'RV', label: 'RV [mm]' }
+    ];
+    const vessels = [
+      { key: 'OpuszkaAorty', label: 'Opuszka aorty [mm]' },
+      { key: 'AortaWstepujaca', label: 'Aorta wstępująca [mm]' },
+      { key: 'MPA', label: 'Pień płucny (MPA) [mm]' }
+    ];
+
+    // Render dynamic fields
+    const dimContainer = document.getElementById('dimContainer');
+    dimensions.forEach(d => {
+      const div = document.createElement('div');
+      div.innerHTML = `<label class=\"block text-sm\">${d.label}<input name=\"${d.key}\" type=\"number\" step=\"any\" class=\"w-full border rounded p-2\"/></label>`;
+      dimContainer.appendChild(div);
+    });
+    const vesContainer = document.getElementById('vesContainer');
+    vessels.forEach(v => {
+      const div = document.createElement('div');
+      div.innerHTML = `<label class=\"block text-sm\">${v.label}<input name=\"${v.key}\" type=\"number\" step=\"any\" class=\"w-full border rounded p-2\"/></label>`;
+      vesContainer.appendChild(div);
+    });
+
+    // Collect form data, omit empty
     function collectData() {
       const data = {};
-      new FormData(document.getElementById('echoForm')).forEach((val, key) => { if(val) data[key] = val; });
+      new FormData(document.getElementById('echoForm')).forEach((val, key) => {
+        if(val) data[key] = val;
+      });
       return data;
     }
-    // CSV Export unchanged
+
+    // CSV Export
+    document.getElementById('exportCsv').addEventListener('click', () => {
+      const csv = Papa.unparse([collectData()]);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
+      link.download = `echo_${collectData().patientID||'record'}.csv`; link.click();
+    });
+
     // DOCX Export with conditional fields
     document.getElementById('exportDocx').addEventListener('click', async () => {
       const { Document, Packer, Paragraph, HeadingLevel } = docx;
@@ -117,8 +189,10 @@
       const doc = new Document();
       const children = [];
       children.push(new Paragraph({ text: 'Formularz badania echokardiograficznego', heading: HeadingLevel.HEADING_1 }));
+
       function addSection(title) { children.push(new Paragraph({ text: title, heading: HeadingLevel.HEADING_2 })); }
       function addField(label, key) { if(data[key] !== undefined) children.push(new Paragraph(`${label}: ${data[key]}`)); }
+
       addSection('1. Dane pacjenta');
       addField('Imię i nazwisko','patientName'); addField('Nr badania / ID','patientID'); addField('Data badania','examDate'); addField('Operator / lekarz','operator');
       addSection('2. Wymiary jam serca'); dimensions.forEach(d=>addField(d.label,d.key));
@@ -127,12 +201,12 @@
       addSection('5. Odcinkowe zaburzenia kurczliwości'); addField('Obecne','segmentalPresent'); addField('Opis segmentów','segmentalDescription');
       addSection('6. TAPSE'); addField('TAPSE [mm]','TAPSE');
       addSection('7. Ocena zastawek');
-      ['mitral','aortic','tricuspid'].forEach(valve=>{
-        addField(`${valve.charAt(0).toUpperCase()+valve.slice(1)} - niedomykalność`, valve+ (valve==='aortic'?'Regurg':'Regurg'));
-        addField(`${valve.charAt(0).toUpperCase()+valve.slice(1)} - stenoza`, valve+'Stenosis');
-      });
+      addField('Mitral - niedomykalność','mitralRegurg'); addField('Mitral - stenoza','mitralStenosis');
+      addField('Aortic - niedomykalność','aorticRegurg'); addField('Aortic - stenoza','aorticStenosis');
+      addField('Tricuspid - niedomykalność','tricuspidRegurg'); addField('Tricuspid - stenoza','tricuspidStenosis');
       addSection('8. Osierdzie'); addField('Płyn obecny','pericardEffusion'); addField('Uwagi','pericardNotes');
       addSection('9. Uwagi końcowe i rekomendacje'); addField('Uwagi','remarks');
+
       doc.addSection({ children });
       const blob = await Packer.toBlob(doc);
       const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
